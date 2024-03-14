@@ -5,15 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.telephony.TelephonyManager;
-import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class CallReceiver extends BroadcastReceiver {
 
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
-    private Context context;
+    private final Context context;
+
+    public CallReceiver(Context context) {
+        this.context = context;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -69,6 +73,6 @@ public class CallReceiver extends BroadcastReceiver {
     }
 
     private String getFilePath() {
-        return context.getExternalCacheDir().getAbsolutePath() + "/call_recording.mp4";
+        return Objects.requireNonNull(context.getExternalCacheDir()).getAbsolutePath() + "/call_recording.mp4";
     }
 }

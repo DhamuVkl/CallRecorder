@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -24,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSION_CODE = 1001;
     private MediaRecorder mediaRecorder;
-    private String recordingFilePath;
     private boolean isRecording = false;
 
     @Override
@@ -32,13 +30,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button recordButton = findViewById(R.id.recordButton);
-        recordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkPermissionsAndStartRecording();
-            }
-        });
+        Button recordButton = findViewById(R.id.record_button);
+
+        recordButton.setOnClickListener(v -> checkPermissionsAndStartRecording());
+
     }
 
     private void checkPermissionsAndStartRecording() {
@@ -106,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create a unique file name with UUID
         String fileName = "recording_" + UUID.randomUUID().toString() + ".3gp";
-        recordingFilePath = getFilePath(fileName);
+        String recordingFilePath = getFilePath(fileName);
 
         if (recordingFilePath != null) {
             try {
@@ -116,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 isRecording = true;
                 Toast.makeText(this, "Recording started", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
                 Toast.makeText(this, "Recording failed to start. Please try again.", Toast.LENGTH_SHORT).show();
             }
@@ -125,13 +121,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Add a delay before allowing the next recording
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Release the MediaRecorder resources after recording
-                stopRecording();
-            }
-        }, 1000); // Delay in milliseconds (adjust as needed)
+        // Release the MediaRecorder resources after recording
+        handler.postDelayed(this::stopRecording, 1000); // Delay in milliseconds (adjust as needed)
     }
 
     private void stopRecording() {
